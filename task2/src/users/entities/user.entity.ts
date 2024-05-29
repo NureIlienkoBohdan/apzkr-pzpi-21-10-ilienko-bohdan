@@ -1,5 +1,12 @@
 import { Roles } from 'core';
-import { Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  Index,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
 @Entity('users')
 export class User {
@@ -24,8 +31,11 @@ export class User {
   })
   roles: Roles[];
 
-  @Column({ default: new Date() })
-  createdAt: Date;
+  @CreateDateColumn()
+  created_at: Date;
+
+  @UpdateDateColumn()
+  updated_at: Date;
 
   @Index('IDX_TOKEN')
   @Column({ nullable: true })

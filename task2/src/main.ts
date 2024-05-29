@@ -12,7 +12,6 @@ async function bootstrap() {
 
   configSwagger(app);
 
-
   // Configure CORS
   app.enableCors({
     origin: '*', // Specify the origin of your React app
@@ -23,6 +22,9 @@ async function bootstrap() {
   await app.listen(3000);
 
   Logger.log(`🌐 Server running on http://localhost:3000`, 'Bootstrap');
-  Logger.log(`📚 Swagger running on http://localhost:3000/api/docs`, 'Bootstrap');
+  Logger.log(
+    `📚 Swagger running on http://localhost:3000/api/docs`,
+    'Bootstrap',
+  );
 }
 bootstrap();

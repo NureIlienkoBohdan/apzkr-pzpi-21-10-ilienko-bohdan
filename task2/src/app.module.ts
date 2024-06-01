@@ -5,6 +5,13 @@ import { getPostgresConfig } from 'core';
 import { UsersModule } from './users/users.module';
 import * as Joi from 'joi';
 import { AuthModule } from './auth/auth.module';
+import { DronesModule } from './drones/drones.module';
+import { RentalsModule } from './rentals/rentals.module';
+import { SupportModule } from './support/support.module';
+import { SubscriptionsModule } from './subscriptions/subscriptions.module';
+import { MaintenancesModule } from './maintenances/maintenances.module';
+import { LeasingModule } from './leasing/leasing.module';
+import { BillingsModule } from './billings/billings.module';
 
 @Module({
   imports: [
@@ -23,6 +30,13 @@ import { AuthModule } from './auth/auth.module';
     TypeOrmModule.forRoot(getPostgresConfig()),
     UsersModule,
     AuthModule,
+    DronesModule,
+    RentalsModule,
+    SupportModule,
+    SubscriptionsModule,
+    MaintenancesModule,
+    LeasingModule,
+    BillingsModule,
   ],
 })
 export class AppModule {}

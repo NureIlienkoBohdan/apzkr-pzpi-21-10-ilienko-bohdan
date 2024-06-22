@@ -1,9 +1,12 @@
 import { Roles } from 'core';
+import { CollaborationApplication } from 'src/collaborations/entities/collaboration-application.entity';
+import { DroneLeaseToCompany } from 'src/leasing/entities/leasing.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
   Index,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -17,6 +20,7 @@ export class User {
   @Column({ unique: true })
   email: string;
 
+  @Index('IDX_NAME')
   @Column()
   name: string;
 
@@ -30,6 +34,24 @@ export class User {
     default: [Roles.TENANT],
   })
   roles: Roles[];
+
+  @OneToMany(
+    () => CollaborationApplication,
+    (collaborationApplication) => collaborationApplication.user,
+    {
+      onDelete: 'CASCADE',
+    },
+  )
+  collaborationApplications: CollaborationApplication[];
+
+  @OneToMany(
+    () => DroneLeaseToCompany,
+    (droneLeaseToCompany) => droneLeaseToCompany.landlord,
+    {
+      onDelete: 'CASCADE',
+    },
+  )
+  droneLeasesToCompany: DroneLeaseToCompany[];
 
   @CreateDateColumn()
   created_at: Date;

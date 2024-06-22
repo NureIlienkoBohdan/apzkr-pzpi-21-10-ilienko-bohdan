@@ -1,26 +1,82 @@
-import { Injectable } from '@nestjs/common';
+// src/support/support.service.ts
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { CreateSupportDto } from './dto/create-support.dto';
 import { UpdateSupportDto } from './dto/update-support.dto';
+import { SupportTicket } from './entities/support-ticket.entity';
+import { User } from 'src/users/entities/user.entity';
 
 @Injectable()
 export class SupportService {
-  create(createSupportDto: CreateSupportDto) {
-    return 'This action adds a new support';
+  constructor(
+    @InjectRepository(SupportTicket)
+    private readonly supportRepository: Repository<SupportTicket>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
+  ) {}
+
+  async create(
+    userId: string,
+    createSupportDto: CreateSupportDto,
+  ): Promise<SupportTicket> {
+    const supportTicket = this.supportRepository.create({
+      ...createSupportDto,
+      user: { id: userId },
+    });
+
+    return await this.supportRepository.save(supportTicket);
   }
 
-  findAll() {
-    return `This action returns all support`;
+  async findAll(): Promise<SupportTicket[]> {
+    return await this.supportRepository.find({
+      relations: ['user', 'manager'],
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} support`;
+  async findOne(id: string): Promise<SupportTicket> {
+    const supportTicket = await this.supportRepository.findOne({
+      where: { id },
+      relations: ['user', 'manager'],
+    });
+    if (!supportTicket) {
+      throw new NotFoundException('Support ticket not found');
+    }
+    return supportTicket;
   }
 
-  update(id: number, updateSupportDto: UpdateSupportDto) {
-    return `This action updates a #${id} support`;
+  async updateAsAComplaint(
+    id: string,
+    userId: string,
+    updateSupportDto: UpdateSupportDto,
+  ): Promise<SupportTicket> {
+    const supportTicket = await this.findOne(id);
+    if (supportTicket.user.id !== userId) {
+      throw new NotFoundException('Support ticket not found');
+    }
+
+    Object.assign(supportTicket, updateSupportDto);
+
+    return await this.supportRepository.save(supportTicket);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} support`;
+  async updateAsAManager(
+    id: string,
+    userId: string,
+    updateSupportDto: UpdateSupportDto,
+  ): Promise<SupportTicket> {
+    const supportTicket = await this.findOne(id);
+    if (supportTicket.manager?.id !== userId) {
+      throw new NotFoundException('Support ticket not found');
+    }
+
+    Object.assign(supportTicket, updateSupportDto);
+
+    return await this.supportRepository.save(supportTicket);
+  }
+
+  async remove(id: string): Promise<void> {
+    const supportTicket = await this.findOne(id);
+    await this.supportRepository.softRemove(supportTicket);
   }
 }

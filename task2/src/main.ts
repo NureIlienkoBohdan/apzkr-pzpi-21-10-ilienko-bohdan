@@ -2,12 +2,16 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { configSwagger } from 'core';
+import { configSwagger, getPort } from 'core';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true,
+    }),
+  );
   app.setGlobalPrefix('api');
 
   configSwagger(app);
@@ -19,11 +23,13 @@ async function bootstrap() {
     credentials: true, // Enable credentials (cookies, authorization headers)
   });
 
-  await app.listen(3000);
+  const PORT = getPort();
 
-  Logger.log(`🌐 Server running on http://localhost:3000`, 'Bootstrap');
+  await app.listen(PORT);
+
+  Logger.log(`🌐 Server running on http://localhost:${PORT}`, 'Bootstrap');
   Logger.log(
-    `📚 Swagger running on http://localhost:3000/api/docs`,
+    `📚 Swagger running on http://localhost:${PORT}/api/docs`,
     'Bootstrap',
   );
 }

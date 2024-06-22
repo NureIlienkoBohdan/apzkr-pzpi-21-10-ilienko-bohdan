@@ -1,8 +1,18 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { DronesService } from './drones.service';
-import { CreateDroneDto } from './dto/create-drone.dto';
-import { UpdateDroneDto } from './dto/update-drone.dto';
+import { CreateDroneDto } from './drone/dto/create-drone.dto';
+import { UpdateDroneDto } from './drone/dto/update-drone.dto';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('drones')
 @Controller('drones')
 export class DronesController {
   constructor(private readonly dronesService: DronesService) {}

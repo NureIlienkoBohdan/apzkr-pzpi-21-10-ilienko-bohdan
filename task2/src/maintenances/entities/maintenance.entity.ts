@@ -1,3 +1,5 @@
+// maintenance.entity.ts
+
 import { Drone } from 'src/drones/entities/drone.entity';
 import { User } from 'src/users/entities/user.entity';
 import {
@@ -7,6 +9,7 @@ import {
   ManyToOne,
   CreateDateColumn,
   UpdateDateColumn,
+  DeleteDateColumn,
 } from 'typeorm';
 
 @Entity('maintenance_records')
@@ -34,4 +37,7 @@ export class MaintenanceRecord {
 
   @UpdateDateColumn()
   updated_at: Date;
+
+  @DeleteDateColumn()
+  deleted_at: Date;
 }

@@ -9,7 +9,7 @@ import {
 import { User } from 'src/users/entities/user.entity';
 import { Drone } from 'src/drones/entities/drone.entity';
 
-enum DroneLeaseStatus {
+export enum DroneLeaseStatus {
   PENDING = 'pending',
   ACTIVE = 'active',
   COMPLETED = 'completed',
@@ -22,7 +22,7 @@ export class DroneLeaseToCompany {
   id: string;
 
   @ManyToOne(() => User) // Пользователь, который сдает дрон в аренду компании
-  user: User;
+  landlord: User;
 
   @ManyToOne(() => Drone) // Дрон, который сдается в аренду компании
   drone: Drone;

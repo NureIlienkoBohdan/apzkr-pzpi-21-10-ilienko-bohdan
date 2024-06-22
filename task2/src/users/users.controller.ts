@@ -9,28 +9,54 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { AccessTokenGuard, OptionalAccessTokenGuard, User } from 'core';
+import { AccessTokenGuard, Role, RoleGuard, Roles, User, UserId } from 'core';
 
+//TODO: add api operation (description)
 @ApiTags('users')
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
-  }
-
   @Get()
   @ApiBearerAuth()
   @UseGuards(AccessTokenGuard)
-  findAll(@User() user: any) {
+  findUserAccountData(@UserId() userId) {
+    return this.usersService.findOneByParams({ id: userId });
+  }
+
+  //TODO: реализовать логику с защитой
+  @Get()
+  @ApiBearerAuth()
+  @UseGuards(AccessTokenGuard)
+  findAll() {
     return this.usersService.findAll();
   }
 
+  @Post()
+  @ApiBearerAuth()
+  @Role([Roles.ADMIN])
+  @UseGuards(AccessTokenGuard, RoleGuard)
+  createUserAsAdmin() {}
+
+  @Post('create-account/landlord')
+  @ApiBearerAuth()
+  @Role([Roles.ADMIN])
+  @UseGuards(AccessTokenGuard, RoleGuard)
+  createLandlordAccount(@UserId() userId: string) {
+    return this.usersService.createAnotherRole(userId, Roles.LANDLORD);
+  }
+
+  @Post('create-account/worker')
+  @ApiBearerAuth()
+  @Role([Roles.ADMIN])
+  @UseGuards(AccessTokenGuard, RoleGuard)
+  createWorkerAccount(@UserId() userId: string) {
+    return this.usersService.createAnotherRole(userId, Roles.WORKER);
+  }
+
+  @UseGuards(AccessTokenGuard)
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.usersService.findOneByParams({ id });

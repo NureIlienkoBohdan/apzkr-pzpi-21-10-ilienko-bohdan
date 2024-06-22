@@ -1,3 +1,5 @@
+// src/subscriptions/entities/subscription.entity.ts
+
 import { User } from 'src/users/entities/user.entity';
 import {
   Entity,

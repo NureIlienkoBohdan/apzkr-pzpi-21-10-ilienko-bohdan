@@ -1,11 +1,16 @@
+// transactions.entity.ts
+
 import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
   ManyToOne,
   CreateDateColumn,
+  UpdateDateColumn,
+  DeleteDateColumn,
 } from 'typeorm';
 import { UserBalance } from './user-balances.entity';
+import { TransactionType } from 'core';
 
 @Entity('transactions')
 export class Transaction {
@@ -18,12 +23,23 @@ export class Transaction {
   @Column({ type: 'float' })
   amount: number;
 
-  @Column()
-  type: string; // Тип транзакції (поповнення, оплата оренди, дохід від оренди і т.д.)
+  @Column({
+    type: 'enum',
+    enum: TransactionType,
+  })
+  type: TransactionType;
 
-  @Column()
-  description: string; // Опис транзакції
+  @Column('text', {
+    nullable: true,
+  })
+  description?: string; // Опис транзакції
 
   @CreateDateColumn()
   created_at: Date;
+
+  @UpdateDateColumn()
+  updated_at: Date;
+
+  @DeleteDateColumn()
+  deleted_at: Date;
 }

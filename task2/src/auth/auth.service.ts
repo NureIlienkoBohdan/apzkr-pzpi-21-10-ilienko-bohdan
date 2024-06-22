@@ -1,7 +1,9 @@
 import {
   ForbiddenException,
+  Inject,
   Injectable,
   UnauthorizedException,
+  forwardRef,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Tokens, StrategyTypes, JwtPayload } from 'core';
@@ -13,8 +15,8 @@ import { UsersService } from 'src/users/users.service';
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly jwtService: JwtService,
-    private readonly usersService: UsersService,
+    private jwtService: JwtService,
+    @Inject(forwardRef(() => UsersService)) private usersService: UsersService,
     // private readonly filesService: FilesService,
   ) {}
 
@@ -109,7 +111,7 @@ export class AuthService {
   }
 
   //#region reusable methods
-  private async generateTokens(payload: JwtPayload): Promise<Tokens> {
+  async generateTokens(payload: JwtPayload): Promise<Tokens> {
     const [accessToken, refreshToken] = await Promise.all([
       this.signToken(payload, '1d'), //TODO: refactor to ENV
       this.signToken(payload, '7d'),

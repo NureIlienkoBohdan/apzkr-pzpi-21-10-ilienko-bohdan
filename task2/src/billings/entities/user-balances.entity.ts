@@ -1,3 +1,5 @@
+// user-balances.entity.ts
+
 import { User } from 'src/users/entities/user.entity';
 import {
   Entity,
@@ -7,6 +9,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   ManyToOne,
+  DeleteDateColumn,
 } from 'typeorm';
 import { Transaction } from './transactions.entity';
 
@@ -29,4 +32,7 @@ export class UserBalance {
 
   @UpdateDateColumn()
   updated_at: Date;
+
+  @DeleteDateColumn()
+  deleted_at: Date;
 }

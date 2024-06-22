@@ -1,3 +1,5 @@
+// support-ticket.entity.ts
+
 import { User } from 'src/users/entities/user.entity';
 import {
   Entity,
@@ -6,6 +8,7 @@ import {
   ManyToOne,
   CreateDateColumn,
   UpdateDateColumn,
+  DeleteDateColumn,
 } from 'typeorm';
 
 @Entity('support_tickets')
@@ -16,8 +19,8 @@ export class SupportTicket {
   @ManyToOne(() => User)
   user: User;
 
-  @ManyToOne(() => User)
-  manager: User;
+  @ManyToOne(() => User, { nullable: true })
+  manager?: User;
 
   @Column()
   subject: string;
@@ -33,4 +36,7 @@ export class SupportTicket {
 
   @UpdateDateColumn()
   updated_at: Date;
+
+  @DeleteDateColumn()
+  deleted_at: Date;
 }

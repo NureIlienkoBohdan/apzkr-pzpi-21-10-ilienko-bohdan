@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { CreateDroneDto } from './dto/create-drone.dto';
-import { UpdateDroneDto } from './dto/update-drone.dto';
+import { CreateDroneDto } from './drone/dto/create-drone.dto';
+import { UpdateDroneDto } from './drone/dto/update-drone.dto';
 
 @Injectable()
 export class DronesService {

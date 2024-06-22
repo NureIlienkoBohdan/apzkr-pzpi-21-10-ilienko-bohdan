@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   NotFoundException,
@@ -9,15 +10,24 @@ import { User } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { hash } from 'argon2';
+import { Roles } from 'core';
+import { AuthService } from 'src/auth/auth.service';
+import { SignUpDto } from 'src/auth/dto/sign-up.dto';
 
+export interface SearchUserParams {
+  id?: string;
+  email?: string;
+  name?: string;
+}
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
+    private readonly authService: AuthService,
   ) {}
 
-  async create(createUserDto: CreateUserDto): Promise<User> {
+  async create(createUserDto: SignUpDto): Promise<User> {
     try {
       const hashedPassword = await hash(createUserDto.password);
       const user = this.usersRepository.create({
@@ -33,25 +43,44 @@ export class UsersService {
     }
   }
 
+  async createAnotherRole(userId: string, role: Roles) {
+    const user = await this.findOneByParams({ id: userId });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    if (user.roles.includes(role)) {
+      throw new BadRequestException(
+        `This user allready have an "${role}" role`,
+      );
+    }
+
+    user.roles.push(role);
+
+    await this.usersRepository.save(user);
+
+    const { id, roles } = user;
+
+    const { accessToken, refreshToken } = await this.authService.generateTokens(
+      {
+        id,
+        roles,
+      },
+    );
+
+    return { accessToken, refreshToken };
+  }
+
   findAll() {
     return this.usersRepository.find();
   }
 
-  // async findOne(id: string): Promise<User> {
-  //   const user = await this.usersRepository.findOne({
-  //     where: { id },
-  //   });
-  //   if (!user) {
-  //     throw new NotFoundException('User not found');
-  //   }
-
-  //   return user;
-  // }
-
-  async findOneByParams(params: any): Promise<User> {
+  async findOneByParams(params: SearchUserParams): Promise<User> {
     const user = await this.usersRepository.findOne({
       where: params,
     });
+
     if (!user) {
       throw new NotFoundException('User not found');
     }

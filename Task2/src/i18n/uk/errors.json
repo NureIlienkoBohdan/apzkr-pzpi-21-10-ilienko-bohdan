@@ -1,0 +1,7 @@
+{
+  "USER_BALANCE_NOT_FOUND": "Баланс користувача не знайдено",
+  "TRANSACTION_NOT_FOUND": "Транзакція з ID {{id}} не знайдена",
+
+  "INVALID_PASSWORD": "Неправильний пароль",
+  "INVALID_REFRESH_TOKEN": "Неправильний токен оновлення"
+}

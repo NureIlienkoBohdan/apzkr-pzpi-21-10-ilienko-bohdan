@@ -1,0 +1,21 @@
+{
+  "HELLO": "Привіт",
+  "PRODUCT": {
+    "NEW": "Новий продукт: {name}"
+  },
+  "ENGLISH": "Англійська",
+  "ARRAY": ["ОДИН", "ДВА", "ТРИ"],
+  "cat": "Кіт",
+  "cat_name": "Кіт: {name}",
+  "set-up-password": {
+    "heading": "Привіт, {username}",
+    "title": "Забули пароль",
+    "followLink": "Будь ласка, перейдіть за посиланням, щоб встановити свій пароль"
+  },
+  "day_interval": {
+    "one": "Щодня",
+    "other": "Кожні {count} днів",
+    "zero": "Ніколи"
+  },
+  "nested": "Ми йдемо на шопінг: $t(test.day_interval, {{\"count\": {count} }})"
+}

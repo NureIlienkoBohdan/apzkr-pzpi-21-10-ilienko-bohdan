@@ -1,4 +1,3 @@
-// src/billings/billings.service.ts
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -8,6 +7,7 @@ import { Transaction } from './entities/transactions.entity';
 import { UserBalance } from './entities/user-balances.entity';
 import { CreateUserBalanceDto } from './dto/create-user-balance.dto';
 import { UpdateUserBalanceDto } from './dto/update-user-balance.dto';
+import { I18nService } from 'nestjs-i18n';
 
 @Injectable()
 export class BillingsService {
@@ -16,6 +16,7 @@ export class BillingsService {
     private readonly transactionRepository: Repository<Transaction>,
     @InjectRepository(UserBalance)
     private readonly userBalanceRepository: Repository<UserBalance>,
+    private readonly i18n: I18nService,
   ) {}
 
   // Транзакції
@@ -27,7 +28,7 @@ export class BillingsService {
       where: { user: { id: userId } },
     });
     if (!userBalance) {
-      throw new NotFoundException('User balance not found');
+      throw new NotFoundException(this.i18n.t('errors.USER_BALANCE_NOT_FOUND'));
     }
     const transaction = this.transactionRepository.create({
       ...dto,
@@ -48,7 +49,9 @@ export class BillingsService {
       relations: ['userBalance'],
     });
     if (!transaction) {
-      throw new NotFoundException('Transaction not found');
+      throw new NotFoundException(
+        this.i18n.t('errors.TRANSACTION_NOT_FOUND', { args: { id } }),
+      );
     }
     return transaction;
   }
@@ -62,7 +65,9 @@ export class BillingsService {
       ...dto,
     });
     if (!transaction) {
-      throw new NotFoundException('Transaction not found');
+      throw new NotFoundException(
+        this.i18n.t('errors.TRANSACTION_NOT_FOUND', { args: { id } }),
+      );
     }
     return await this.transactionRepository.save(transaction);
   }
@@ -72,9 +77,12 @@ export class BillingsService {
   }
 
   // Баланси користувачів
-  async createUserBalance(dto: CreateUserBalanceDto): Promise<UserBalance> {
+  async createUserBalance(
+    userId: string,
+    dto: CreateUserBalanceDto,
+  ): Promise<UserBalance> {
     const userBalance = this.userBalanceRepository.create({
-      user: { id: dto.userId },
+      user: { id: userId },
       balance: dto.initialBalance,
     });
     return await this.userBalanceRepository.save(userBalance);
@@ -92,7 +100,9 @@ export class BillingsService {
       relations: ['user', 'transactions'],
     });
     if (!balance) {
-      throw new NotFoundException(`User balance with ID ${id} not found`);
+      throw new NotFoundException(
+        this.i18n.t('errors.USER_BALANCE_NOT_FOUND', { args: { id } }),
+      );
     }
     return balance;
   }
@@ -103,7 +113,9 @@ export class BillingsService {
   ): Promise<UserBalance> {
     const balance = await this.userBalanceRepository.preload({ id, ...dto });
     if (!balance) {
-      throw new NotFoundException(`User balance with ID ${id} not found`);
+      throw new NotFoundException(
+        this.i18n.t('errors.USER_BALANCE_NOT_FOUND', { args: { id } }),
+      );
     }
     return await this.userBalanceRepository.save(balance);
   }

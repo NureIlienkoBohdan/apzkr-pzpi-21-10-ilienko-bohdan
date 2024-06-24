@@ -72,17 +72,35 @@ export class UsersService {
     return { accessToken, refreshToken };
   }
 
-  findAll() {
-    return this.usersRepository.find();
+  async findAll(withCreds = false) {
+    if (withCreds) {
+      return this.usersRepository.find();
+    }
+
+    const users = await this.usersRepository.find();
+    users.map((user) => {
+      delete user.password;
+      delete user.token;
+    });
+
+    return users;
   }
 
-  async findOneByParams(params: SearchUserParams): Promise<User> {
+  async findOneByParams(
+    params: SearchUserParams,
+    hideCreds = false,
+  ): Promise<User> {
     const user = await this.usersRepository.findOne({
       where: params,
     });
 
     if (!user) {
       throw new NotFoundException('User not found');
+    }
+
+    if (hideCreds) {
+      delete user.password;
+      delete user.token;
     }
 
     return user;

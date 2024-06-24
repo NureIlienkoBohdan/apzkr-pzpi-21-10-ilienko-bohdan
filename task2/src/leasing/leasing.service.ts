@@ -90,5 +90,17 @@ export class LeasingService {
     });
   }
 
-  async remove(id: number) {}
+  async remove(id: string) {
+    const leasing = await this.leasingRepository.findOne({
+      where: {
+        id: id,
+      },
+    });
+
+    if (!leasing) {
+      throw new NotFoundException('Leasing not found');
+    }
+
+    return await this.leasingRepository.remove(leasing);
+  }
 }

@@ -1,11 +1,12 @@
 import {
-  Body,
   Controller,
-  Delete,
   Get,
-  Param,
-  Patch,
+  Query,
   Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
@@ -25,8 +26,7 @@ export class DroneController {
     operationId: 'create',
     description: 'This endpoint is used to create drone',
   })
-  @Role([Roles.ADMIN])
-  @UseGuards(AccessTokenGuard, RoleGuard)
+  @UseGuards(AccessTokenGuard)
   @Post()
   create(@Body() createDroneDto: CreateDroneDto) {
     return this.droneService.create(createDroneDto);
@@ -43,17 +43,24 @@ export class DroneController {
   }
 
   @ApiOperation({
+    summary: 'Find available drones',
+    operationId: 'findAvailable',
+    description:
+      'This endpoint is used to find available drones with pricing in the desired currency',
+  })
+  @Get('available')
+  findAvailable(@Query('currency') currency: string = 'USD') {
+    return this.droneService.findAvailable(currency);
+  }
+
+  @ApiOperation({
     summary: 'Update drone',
     operationId: 'updateDrone',
     description: 'This endpoint is used to update drone',
   })
-  @Patch()
-  update(@Body() updateDroneDto: UpdateDroneDto) {
-    return this.droneService.update({
-      ownerId: '60f4c3e3e5f2a4d9e6b2e0e9',
-      droneId: '60f4c3e3e5f2a4d9e6b2e0e9',
-      updateDroneDto,
-    });
+  @Patch(':id')
+  update(@Param('id') id: string, @Body() updateDroneDto: UpdateDroneDto) {
+    return this.droneService.update({ droneId: id, updateDroneDto });
   }
 
   @ApiOperation({

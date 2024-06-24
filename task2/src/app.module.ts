@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { getPostgresConfig } from 'core';
 import { UsersModule } from './users/users.module';
@@ -14,8 +14,31 @@ import { LeasingModule } from './leasing/leasing.module';
 import { BillingsModule } from './billings/billings.module';
 import { CollaborationsModule } from './collaborations/collaborations.module';
 
+import {
+  AcceptLanguageResolver,
+  HeaderResolver,
+  I18nModule,
+  QueryResolver,
+} from 'nestjs-i18n';
+import * as path from 'path';
+
 @Module({
   imports: [
+    I18nModule.forRootAsync({
+      useFactory: (configService: ConfigService) => ({
+        fallbackLanguage: 'en',
+        loaderOptions: {
+          path: path.join(__dirname, '../src/i18n/'), // Корректный путь к директории
+          watch: true,
+        },
+      }),
+      resolvers: [
+        { use: QueryResolver, options: ['lang'] },
+        AcceptLanguageResolver,
+        new HeaderResolver(['x-lang']),
+      ],
+      inject: [ConfigService],
+    }),
     ConfigModule.forRoot({
       envFilePath: ['.env'],
       isGlobal: true,
@@ -40,5 +63,7 @@ import { CollaborationsModule } from './collaborations/collaborations.module';
     BillingsModule,
     CollaborationsModule,
   ],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}

@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { configSwagger, getPort } from 'core';
+import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -24,6 +25,15 @@ async function bootstrap() {
   });
 
   const PORT = getPort();
+
+  app.connectMicroservice<MicroserviceOptions>({
+    transport: Transport.MQTT,
+    options: {
+      url: 'mqtt://localhost:1883',
+    },
+  });
+
+  await app.startAllMicroservices();
 
   await app.listen(PORT);
 

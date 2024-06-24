@@ -11,53 +11,18 @@ import { SignUpDto } from './dto/sign-up.dto';
 import { hash, verify } from 'argon2';
 import { SignInDto } from './dto/sign-in.dto';
 import { UsersService } from 'src/users/users.service';
+import { I18nService } from 'nestjs-i18n';
 
 @Injectable()
 export class AuthService {
   constructor(
     private jwtService: JwtService,
     @Inject(forwardRef(() => UsersService)) private usersService: UsersService,
-    // private readonly filesService: FilesService,
+    private readonly i18n: I18nService,
   ) {}
-
-  // async loginWithAnotherProvider(
-  //   user: any,
-  //   strategy: StrategyTypes,
-  // ): Promise<Tokens> {
-  //   if (!user) {
-  //     throw new UnauthorizedException('Invalid credentials');
-  //   }
-
-  //   const userExists = await this.usersService.findOneByEmail(user.email);
-  //   if (userExists) {
-  //     const { accessToken, refreshToken } = await this.generateTokens({
-  //       id: userExists.id,
-  //       roles: [userExists.role],
-  //     });
-  //     return { accessToken, refreshToken };
-  //   }
-
-  //   const { id, role } = await this.usersService.signupWithAnotherProvider(
-  //     user,
-  //     strategy,
-  //   );
-
-  //   const { accessToken, refreshToken } = await this.generateTokens({
-  //     id,
-  //     role,
-  //   });
-
-  //   return { accessToken, refreshToken };
-  // }
 
   async signUp(signUpDto: SignUpDto, picture): Promise<Tokens> {
     const { id, roles } = await this.usersService.create(signUpDto);
-
-    //TODO: uncomment after implementing user image upload to s3 bucket
-    // if (picture) {
-    //   const { id: pictureId } = await this.filesService.saveOne(picture);
-    //   await this.usersService.setPicture(id, pictureId);
-    // }
 
     const { accessToken, refreshToken } = await this.generateTokens({
       id,
@@ -75,7 +40,7 @@ export class AuthService {
     const isPasswordValid = await verify(password, signInDto.password);
 
     if (!isPasswordValid) {
-      throw new UnauthorizedException('Invalid password');
+      throw new UnauthorizedException(this.i18n.t('errors.INVALID_PASSWORD'));
     }
 
     const { accessToken, refreshToken } = await this.generateTokens({
@@ -87,7 +52,7 @@ export class AuthService {
   }
 
   logOut(userId: string): void {
-    // this.usersService.updateRefreshToken(userId, null);
+    this.usersService.updateRefreshToken(userId, null);
   }
 
   async refreshTokens(userId: string, token: string): Promise<Tokens> {
@@ -95,12 +60,12 @@ export class AuthService {
       await this.usersService.findOneByParams({ id: userId });
 
     if (!hashedRefreshToken) {
-      throw new ForbiddenException('Invalid refresh token');
+      throw new ForbiddenException(this.i18n.t('errors.INVALID_REFRESH_TOKEN'));
     }
     const isRefreshTokenValid = await verify(hashedRefreshToken, token);
 
     if (!isRefreshTokenValid) {
-      throw new ForbiddenException('Invalid refresh token');
+      throw new ForbiddenException(this.i18n.t('errors.INVALID_REFRESH_TOKEN'));
     }
     const { accessToken, refreshToken } = await this.generateTokens({
       id: userId,

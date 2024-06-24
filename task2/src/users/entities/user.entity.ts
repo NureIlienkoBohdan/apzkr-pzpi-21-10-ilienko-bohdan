@@ -35,6 +35,9 @@ export class User {
   })
   roles: Roles[];
 
+  @Column()
+  birthDate: Date;
+
   @OneToMany(
     () => CollaborationApplication,
     (collaborationApplication) => collaborationApplication.user,

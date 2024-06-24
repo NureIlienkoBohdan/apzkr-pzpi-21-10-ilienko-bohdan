@@ -10,7 +10,7 @@ import {
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AccessTokenGuard, Role, RoleGuard, Roles, User, UserId } from 'core';
 
 //TODO: add api operation (description)
@@ -19,12 +19,12 @@ import { AccessTokenGuard, Role, RoleGuard, Roles, User, UserId } from 'core';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Get()
-  @ApiBearerAuth()
-  @UseGuards(AccessTokenGuard)
-  findUserAccountData(@UserId() userId) {
-    return this.usersService.findOneByParams({ id: userId });
-  }
+  // @Get()
+  // @ApiBearerAuth()
+  // @UseGuards(AccessTokenGuard)
+  // findUserAccountData(@UserId() userId) {
+  //   return this.usersService.findOneByParams({ id: userId });
+  // }
 
   //TODO: реализовать логику с защитой
   @Get()
@@ -32,6 +32,19 @@ export class UsersController {
   @UseGuards(AccessTokenGuard)
   findAll() {
     return this.usersService.findAll();
+  }
+
+  @Get('profile')
+  @ApiOperation({
+    summary: 'Get user profile',
+    description: 'Get user profile (only for authenticated users)',
+  })
+  @ApiBearerAuth()
+  @UseGuards(AccessTokenGuard)
+  findProfile(
+    @UserId() userId: string,
+  ): Promise<{ id: string; email: string; name: string; roles: Roles[] }> {
+    return this.usersService.findOneByParams({ id: userId }, true);
   }
 
   @Post()

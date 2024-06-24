@@ -54,6 +54,6 @@ export class LeasingController {
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.leasingService.remove(+id);
+    return this.leasingService.remove(id);
   }
 }

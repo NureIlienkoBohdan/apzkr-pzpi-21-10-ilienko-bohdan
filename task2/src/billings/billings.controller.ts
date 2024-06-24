@@ -32,8 +32,8 @@ export class BillingsController {
   @ApiOperation({ summary: 'Create a transaction' })
   @ApiBearerAuth()
   @Post('transactions')
-  @Role([Roles.TENANT, Roles.LANDLORD])
-  @UseGuards(AccessTokenGuard, RoleGuard)
+  // @Role([Roles.TENANT, Roles.LANDLORD, Roles.ADMIN, Roles.WORKER])
+  @UseGuards(AccessTokenGuard)
   @ApiResponse({
     status: 201,
     description: 'The transaction has been successfully created.',
@@ -131,8 +131,11 @@ export class BillingsController {
     description: 'The user balance has been successfully created.',
     type: UserBalance,
   })
-  createUserBalance(@Body() createUserBalanceDto: CreateUserBalanceDto) {
-    return this.billingsService.createUserBalance(createUserBalanceDto);
+  createUserBalance(
+    @UserId() userId: string,
+    @Body() createUserBalanceDto: CreateUserBalanceDto,
+  ) {
+    return this.billingsService.createUserBalance(userId, createUserBalanceDto);
   }
 
   @ApiOperation({ summary: 'Get all user balances' })
